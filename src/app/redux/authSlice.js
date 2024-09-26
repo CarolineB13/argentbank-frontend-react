@@ -12,7 +12,7 @@ export const login = createAsyncThunk('auth/login', async ({ username, password 
 
   const data = await response.json();
   if (response.ok) {
-    return data.body.token;
+    return { token: data.body.token, firstName: data.body.firstName, lastName: data.body.lastName };
   } else {
     throw new Error(data.message || 'Failed to login');
   }
@@ -39,32 +39,34 @@ export const fetchUserProfile = createAsyncThunk('auth/fetchUserProfile', async 
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: { token: null, status: 'idle', error: null },
+  initialState: { token: null, profile: null, status: 'idle', error: null },
   reducers: {
     logout: (state) => {
-      state.token = null; // Réinitialise le token pour déconnecter l'utilisateur
-      state.profile = null; // Réinitialise le profil utilisateur
-      state.status = 'idle'; // Réinitialise le status
-      state.error = null; // Réinitialise les erreurs
-    }
+      state.token = null;
+      state.profile = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('profile');
+      state.status = 'idle';
+      state.error = null;
+    },
+    restoreAuth: (state, action) => {
+      state.token = action.payload.token;
+      state.profile = action.payload.profile;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(login.pending, (state) => {
-        state.status = 'loading';
-      })
       .addCase(login.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.token = action.payload;
-      })
-      .addCase(login.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message;
+        state.token = action.payload.token;
+        state.profile = { firstName: action.payload.firstName, lastName: action.payload.lastName };
+        localStorage.setItem('token', action.payload.token);
+        localStorage.setItem('profile', JSON.stringify({ firstName: action.payload.firstName, lastName: action.payload.lastName }));
       })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
-        state.profile = action.payload; // Stocke le profil utilisateur
+        state.profile = action.payload;
       });
   },
 });
-export const { logout } = authSlice.actions;
+
+export const { logout, restoreAuth } = authSlice.actions;
 export default authSlice.reducer;

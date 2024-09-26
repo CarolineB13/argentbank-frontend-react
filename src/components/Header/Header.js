@@ -37,7 +37,7 @@ function Header() {
   {profile ? profile.firstName : "User"}
 </Link>
 <Link className="main-nav-item" to="/" onClick={handleLogout}>
-<i className="fa fa-sign-out"></i> Sign Out
+<i className="fa fa-sign-out-alt"></i> Sign Out
 </Link>
 </>
 ) : ( 
