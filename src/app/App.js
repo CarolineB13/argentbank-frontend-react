@@ -13,15 +13,18 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('token');
-    const savedProfile = JSON.parse(localStorage.getItem('profile'));
+    const savedToken = sessionStorage.getItem('token');
+    const savedProfile = JSON.parse(sessionStorage.getItem('profile'));
 
-    if (savedToken && savedProfile) {
+    if (savedToken && savedToken !== "null" && savedProfile) {
+      console.log("Restauration du token et du profil depuis sessionStorage...");
+      console.log("Token:", savedToken);
       dispatch(restoreAuth({ token: savedToken, profile: savedProfile }));
-    }
-     // Si un token est restauré, on récupère le profil utilisateur
-     if (savedToken) {
+      console.log('Profil restauré depuis sessionStorage :', savedProfile);
       dispatch(fetchUserProfile(savedToken));
+    } else {
+      console.error('Token manquant ou invalide lors de la restauration');
+    
     }
   }, [dispatch]);
 

@@ -12,10 +12,10 @@ function Header() {
   const profile = useSelector((state) => state.auth.profile);
 
   const handleLogout = () => {
-    dispatch(logout()); // Déconnecte l'utilisateur
-    localStorage.removeItem('token'); // Supprime le token de localStorage
+    dispatch(logout());
     sessionStorage.removeItem('token'); // Supprime le token de sessionStorage
-    navigate('/'); // Redirige vers la page d'accueil
+    sessionStorage.removeItem('profile'); // Supprime le profil de sessionStorage
+    navigate('/');
   };
 
   return (
@@ -33,11 +33,10 @@ function Header() {
         <>
   {/*Affiche le bouton de déconnexion et le prénom si l'utilisateur est connecté */}
   <Link className="main-nav-item" to="/user">
-  <i className="fa fa-user-circle"></i>
-  {profile ? profile.firstName : "User"}
+  <i className="fa fa-user-circle"></i> {profile ? profile.userName : "User"}
 </Link>
 <Link className="main-nav-item" to="/" onClick={handleLogout}>
-<i className="fa fa-sign-out-alt"></i> Sign Out
+<i className="fa fa-sign-out"></i> Sign Out
 </Link>
 </>
 ) : ( 
