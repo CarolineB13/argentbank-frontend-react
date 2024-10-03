@@ -11,7 +11,6 @@ export const login = createAsyncThunk('auth/login', async ({ username, password 
   });
 
   const data = await response.json();
-  console.log('Réponse de l\'API login :', data);
   if (response.ok) {
     return { token: data.body.token, profile: data.body };
   } else {
@@ -63,7 +62,8 @@ const authSlice = createSlice({
     logout: (state) => {
       state.token = null;
       state.profile = null;
-      sessionStorage.removeItem('token');  // Supprime le token et le profil de sessionStorage
+      // Supprime le token et le profil de sessionStorage
+      sessionStorage.removeItem('token');  
       sessionStorage.removeItem('profile');
       state.status = 'idle';
       state.error = null;
@@ -77,16 +77,15 @@ const authSlice = createSlice({
     builder
     .addCase(login.fulfilled, (state, action) => {
       state.token = action.payload.token;
-      state.profile = action.payload.profile;
+      
 
       if (action.payload.token) {
       sessionStorage.setItem('token', action.payload.token);
-      console.log('Token enregistré dans sessionStorage :', sessionStorage.getItem('token')); // Stocke le token dans sessionStorage
+      
       }else{
       console.error ('Erreur : le token est null ou undefined');
       }
-      sessionStorage.setItem('profile', JSON.stringify(action.payload.profile)); // Stocke le profil dans sessionStorage
-      console.log('Profil enregistré dans sessionStorage :', sessionStorage.getItem('profile'));
+     
     })
     .addCase(fetchUserProfile.fulfilled, (state, action) => {
       state.profile = action.payload;
@@ -95,6 +94,10 @@ const authSlice = createSlice({
     .addCase(updateUsername.fulfilled, (state, action) => {
       state.profile = { ...state.profile, userName: action.payload.userName };  // Met à jour le username dans le store
       sessionStorage.setItem('profile', JSON.stringify(state.profile));  // Met à jour également dans sessionStorage
+    })
+    .addCase(login.rejected, (state, action) => {
+      state.status = 'failed';
+      state.error = action.error.message; // Enregistre l'erreur en cas d'échec de la connexion
     });
   },
 });
