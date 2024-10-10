@@ -55,10 +55,13 @@ export const updateUsername = createAsyncThunk('auth/updateUsername', async ({ t
   }
 });
 
+// Création du slice pour gérer l'authentification
+// `authSlice` contient l'état de l'authentification, les reducers, et les extraReducers pour gérer les actions asynchrones.
 const authSlice = createSlice({
   name: 'auth',
   initialState: { token: null, profile: null, status: 'idle', error: null },
   reducers: {
+    // Action pour déconnecter l'utilisateur
     logout: (state) => {
       state.token = null;
       state.profile = null;
@@ -68,6 +71,7 @@ const authSlice = createSlice({
       state.status = 'idle';
       state.error = null;
     },
+    // Action pour restaurer l'état d'authentification à partir du sessionStorage
     restoreAuth: (state, action) => {
       state.token = action.payload.token;
       state.profile = action.payload.profile;
@@ -77,8 +81,7 @@ const authSlice = createSlice({
     builder
     .addCase(login.fulfilled, (state, action) => {
       state.token = action.payload.token;
-      
-
+      // Si le token est valide, on le stocke dans sessionStorage pour maintenir la session active même après un rafraîchissement de la page.
       if (action.payload.token) {
       sessionStorage.setItem('token', action.payload.token);
       
@@ -89,18 +92,23 @@ const authSlice = createSlice({
     })
     .addCase(fetchUserProfile.fulfilled, (state, action) => {
       state.profile = action.payload;
-      sessionStorage.setItem('profile', JSON.stringify(action.payload));  // Met à jour le profil dans sessionStorage
+      // Met à jour le profil dans sessionStorage pour conserver les informations après un rafraîchissement de la page.
+      sessionStorage.setItem('profile', JSON.stringify(action.payload));
     })
     .addCase(updateUsername.fulfilled, (state, action) => {
-      state.profile = { ...state.profile, userName: action.payload.userName };  // Met à jour le username dans le store
-      sessionStorage.setItem('profile', JSON.stringify(state.profile));  // Met à jour également dans sessionStorage
+      // Met à jour le nom d'utilisateur dans le store tout en conservant les autres informations de profil.
+      state.profile = { ...state.profile, userName: action.payload.userName };
+      // Met également à jour le profil dans sessionStorage pour maintenir la cohérence.
+      sessionStorage.setItem('profile', JSON.stringify(state.profile));
     })
     .addCase(login.rejected, (state, action) => {
       state.status = 'failed';
-      state.error = action.error.message; // Enregistre l'erreur en cas d'échec de la connexion
+      // Enregistre l'erreur dans l'état pour l'afficher éventuellement à l'utilisateur.
+      state.error = action.error.message;
     });
   },
 });
 
+// Exportation des actions et du reducer pour utilisation dans le store Redux.
 export const { logout, restoreAuth } = authSlice.actions;
 export default authSlice.reducer;

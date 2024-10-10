@@ -17,15 +17,12 @@ function App() {
     const savedProfile = JSON.parse(sessionStorage.getItem('profile'));
 
     if (savedToken && savedToken !== "null" && savedProfile) {
-      console.log("Restauration du token et du profil depuis sessionStorage...");
-      console.log("Token:", savedToken);
+      //console.log("Restauration du token et du profil depuis sessionStorage...");
+      //console.log("Token:", savedToken);
       dispatch(restoreAuth({ token: savedToken, profile: savedProfile }));
-      console.log('Profil restauré depuis sessionStorage :', savedProfile);
+      //console.log('Profil restauré depuis sessionStorage :', savedProfile);
       dispatch(fetchUserProfile(savedToken));
-    } else {
-      console.error('Token manquant ou invalide lors de la restauration');
-    
-    }
+    } 
   }, [dispatch]);
 
   return (
